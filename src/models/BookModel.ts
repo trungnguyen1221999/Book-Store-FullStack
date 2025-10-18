@@ -7,11 +7,11 @@ export interface IBook extends Document {
   description: string;
   oldPrice?: number;
   newPrice: number;
-  coverColor?: string;
+  coverColor?: string[];
   quantity: number;
   images: string[];
   trending: boolean;
-  categoryId: mongoose.Schema.Types.ObjectId;
+  categoryId?: mongoose.Schema.Types.ObjectId;
 }
 
 // Book schema
@@ -40,19 +40,21 @@ const BookSchema: Schema = new Schema(
       min: 0,
       required: true,
     },
-    coverColor: {
-      type: String,
-      enum: [
-        "red",
-        "blue",
-        "green",
-        "yellow",
-        "black",
-        "white",
-        "gray",
-        "pink",
-      ],
-    },
+    coverColor: [
+      {
+        type: String,
+        enum: [
+          "red",
+          "blue",
+          "green",
+          "yellow",
+          "black",
+          "white",
+          "gray",
+          "pink",
+        ],
+      },
+    ],
     quantity: {
       type: Number,
       required: true,
@@ -72,7 +74,6 @@ const BookSchema: Schema = new Schema(
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: true,
     },
   },
   {
