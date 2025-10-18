@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, RequestHandler } from "express";
 import {
   createABook,
   deleteABook,
@@ -29,11 +29,18 @@ routers.get("/sort/sold", sortBySold);
 routers.get("/books", getAllBooks);
 
 // ADMIN ONLY ROUTES - Chỉ admin mới được thêm/sửa/xóa books
-routers.use(authenticateToken); // Require login
-routers.use(requireAdmin); // Require admin role
-
-routers.post("/add-book", createABook);
-routers.put("/edit-book/:id", editABook);
-routers.delete("/delete-book/:id", deleteABook);
+routers.post("/add-book", authenticateToken as RequestHandler, requireAdmin as any, createABook as any);
+routers.put(
+  "/edit-book/:id",
+  authenticateToken as RequestHandler,
+  requireAdmin as RequestHandler,
+  editABook as RequestHandler
+);
+routers.delete(
+  "/delete-book/:id",
+  authenticateToken as RequestHandler,
+  requireAdmin as RequestHandler,
+  deleteABook as RequestHandler
+);
 
 export default routers;

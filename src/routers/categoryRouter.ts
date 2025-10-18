@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, RequestHandler } from "express";
 import {
   createACategory,
   getAllCategories,
@@ -19,8 +19,8 @@ categoryRouters.get("/hello", (req, res) => {
 categoryRouters.get("/categories", getAllCategories);
 
 // ADMIN ONLY ROUTES - Chỉ admin mới được thêm/sửa/xóa
-categoryRouters.use(authenticateToken); // Require login
-categoryRouters.use(requireAdmin); // Require admin role
+categoryRouters.use(authenticateToken as RequestHandler); // Require login
+categoryRouters.use(requireAdmin as RequestHandler); // Require admin role
 
 categoryRouters.post("/add-category", createACategory);
 categoryRouters.put("/edit-category/:id", editACategory);

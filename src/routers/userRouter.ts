@@ -12,6 +12,7 @@ import {
   authenticateToken,
   requireAdmin,
 } from "../middleware/authMiddleware.js";
+import { Request, RequestHandler } from "express";
 
 const userRouter = express.Router();
 
@@ -25,16 +26,35 @@ userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
 
 // PROTECTED ROUTES - Cần accessToken
-userRouter.use(authenticateToken); // All routes below require authentication
 
 // User profile routes
-userRouter.get("/profile", getUserProfile); // GET /users/profile
-userRouter.put("/profile", updateUserProfile); // PUT /users/profile
-userRouter.put("/change-password", changePassword); // PUT /users/change-password
-userRouter.delete("/account", deleteUserAccount); // DELETE /users/account
-
+userRouter.get(
+  "/profile",
+  authenticateToken as RequestHandler,
+  getUserProfile as RequestHandler
+); // GET /users/profile
+userRouter.put(
+  "/profile",
+  authenticateToken as RequestHandler,
+  updateUserProfile as RequestHandler
+); // PUT /users/profile
+userRouter.put(
+  "/change-password",
+  authenticateToken as RequestHandler,
+  changePassword as RequestHandler
+); // PUT /users/change-password
 // ADMIN ONLY ROUTES
-userRouter.get("/all", requireAdmin, getAllUsers); // GET /users/all
-
+userRouter.get(
+  "/all",
+  authenticateToken as RequestHandler,
+  requireAdmin as RequestHandler,
+  getAllUsers as RequestHandler
+); // GET /users/all
+userRouter.delete(
+  "/delete",
+  authenticateToken as RequestHandler,
+  requireAdmin as RequestHandler,
+  deleteUserAccount as RequestHandler
+); // DELETE /users/delete
 
 export default userRouter;

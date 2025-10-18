@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import {
   getCart,
   addToCart,
@@ -11,13 +11,13 @@ import { authenticateToken } from "../middleware/authMiddleware.js";
 const cartRouter = express.Router();
 
 // Tất cả cart routes đều cần authentication
-cartRouter.use(authenticateToken);
+cartRouter.use(authenticateToken as express.RequestHandler);
 
 // Cart routes
-cartRouter.get("/", getCart); // GET /cart
-cartRouter.post("/add", addToCart); // POST /cart/add
-cartRouter.put("/update/:bookId", updateCartItem); // PUT /cart/update/bookId
-cartRouter.delete("/remove/:bookId", removeFromCart); // DELETE /cart/remove/bookId
-cartRouter.delete("/clear", clearCart); // DELETE /cart/clear
+cartRouter.get("/", getCart as express.RequestHandler); // GET /cart
+cartRouter.post("/add", addToCart as express.RequestHandler); // POST /cart/add
+cartRouter.put("/update/:bookId", updateCartItem as express.RequestHandler); // PUT /cart/update/bookId
+cartRouter.delete("/remove/:bookId", removeFromCart as express.RequestHandler); // DELETE /cart/remove/bookId
+cartRouter.delete("/clear", clearCart as express.RequestHandler); // DELETE /cart/clear
 
 export default cartRouter;
