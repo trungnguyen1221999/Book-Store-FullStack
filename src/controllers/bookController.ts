@@ -58,7 +58,7 @@ const sortByPrice = async (req: Request, res: Response) => {
   try {
     // Check if 'asc' exists in query, otherwise default to 'desc'
     const isAscending = "asc" in req.query;
-    const sortOrder = isAscending ? 1 : -1; // asc = 1 (tăng dần), desc = -1 (giảm dần)
+    const sortOrder = isAscending ? -1 : 1; // asc = 1 (tăng dần), desc = -1 (giảm dần)
 
     const SortBooks = await Book.find().sort({ newPrice: sortOrder });
 
@@ -69,12 +69,10 @@ const sortByPrice = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Sort error:", error); // Add logging to debug
-    return res
-      .status(500)
-      .json({
-        message: "Error sorting books",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    return res.status(500).json({
+      message: "Error sorting books",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
