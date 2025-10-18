@@ -76,4 +76,102 @@ const sortByPrice = async (req: Request, res: Response) => {
   }
 };
 
-export { createABook, getAllBooks, editABook, deleteABook, sortByPrice };
+const sortBySold = async (req: Request, res: Response) => {
+  try {
+    // Mặc định: bán chạy nhất trước (descending)
+    const isAscending = "asc" in req.query;
+    const sortOrder = isAscending ? 1 : -1; // desc = -1 (mặc định), asc = 1
+    const sortBooks = await Book.find().sort({ sold: sortOrder });
+    const sortType = isAscending
+      ? "ascending (least sold first)"
+      : "descending (bestsellers first)";
+    return res.status(200).json({
+      message: `Books sorted by sold in ${sortType}`,
+      data: sortBooks,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error sorting books by sold",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+// COMBINED FILTER + SORT for Frontend
+const getFilteredAndSortedBooks = async (req: Request, res: Response) => {
+  try {
+    const {
+      categoryId,
+      sort = "sold", // Ngắn gọn hơn: sort thay vì sortBy
+      order = "desc", // Ngắn gọn hơn: order thay vì sortOrder
+      min,
+      max,
+    } = req.query;
+
+    // Build filter object
+    const filter: any = {};
+
+    // Filter by category
+    if (categoryId) {
+      filter.categoryId = categoryId;
+    }
+
+    // Filter by price range
+    if (min || max) {
+      filter.newPrice = {};
+      if (min) filter.newPrice.$gte = Number(min);
+      if (max) filter.newPrice.$lte = Number(max);
+    }
+
+    // KHÔNG filter trending nữa - chỉ sort thôi
+
+    // Build sort object
+    const sortObj: any = {};
+
+    if (sort === "price") {
+      sortObj.newPrice = order === "asc" ? 1 : -1;
+    } else if (sort === "sold") {
+      sortObj.sold = order === "asc" ? 1 : -1;
+    } else if (sort === "trending") {
+      // Trending products first (true = 1, false = 0)
+      sortObj.trending = order === "asc" ? 1 : -1;
+    } else if (sort === "name") {
+      sortObj.title = order === "asc" ? 1 : -1;
+    } else {
+      // Default: sort by sold descending (bestsellers)
+      sortObj.sold = -1;
+    } // Execute query with filter and sort
+    const books = await Book.find(filter)
+      .populate("categoryId", "name") // Populate category name
+      .sort(sortObj);
+
+    const message = `Books filtered and sorted successfully`;
+
+    return res.status(200).json({
+      message,
+      filters: {
+        categoryId: categoryId || "all",
+        priceRange: { min: min || "none", max: max || "none" },
+        sort: sort,
+        order: order,
+      },
+      count: books.length,
+      data: books,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error filtering and sorting books",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+export {
+  createABook,
+  getAllBooks,
+  editABook,
+  deleteABook,
+  sortByPrice,
+  sortBySold,
+  getFilteredAndSortedBooks,
+};

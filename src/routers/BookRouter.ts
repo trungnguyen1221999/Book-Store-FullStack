@@ -5,6 +5,8 @@ import {
   editABook,
   getAllBooks,
   sortByPrice,
+  sortBySold,
+  getFilteredAndSortedBooks,
 } from "../controllers/bookController.js";
 import {
   authenticateToken,
@@ -17,7 +19,13 @@ const routers = Router();
 routers.get("/hello", (req, res) => {
   res.json({ message: "Hello from BookRouter!" });
 });
-routers.get("/sort", sortByPrice);
+
+// COMBINED FILTER + SORT - Main endpoint for frontend
+routers.get("/filter", getFilteredAndSortedBooks);
+
+// Individual sort routes (backward compatibility)
+routers.get("/sort/price", sortByPrice);
+routers.get("/sort/sold", sortBySold);
 routers.get("/books", getAllBooks);
 
 // ADMIN ONLY ROUTES - Chỉ admin mới được thêm/sửa/xóa books
