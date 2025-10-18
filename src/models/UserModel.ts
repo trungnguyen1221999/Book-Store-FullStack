@@ -8,8 +8,9 @@ export interface IUser extends Document {
   password: string;
   phone?: string;
   avatar?: string;
-  role: "customer" | "admin" ;
+  role: "customer" | "admin";
   isEmailVerified: boolean;
+  refreshToken?: string;
   address: {
     street?: string;
     city?: string;
@@ -70,6 +71,10 @@ const UserSchema: Schema = new Schema(
       type: Boolean,
       default: false,
     },
+    refreshToken: {
+      type: String,
+      select: false, // Không trả về trong queries mặc định
+    },
     address: {
       street: { type: String, trim: true },
       city: { type: String, trim: true },
@@ -86,12 +91,11 @@ const UserSchema: Schema = new Schema(
         message: "Date of birth must be in the past",
       },
     },
-    },
+  },
   {
     timestamps: true,
   }
 );
-
 
 // Create and export the model
 const User = mongoose.model<IUser>("User", UserSchema);

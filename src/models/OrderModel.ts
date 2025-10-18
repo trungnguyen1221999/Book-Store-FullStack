@@ -33,10 +33,8 @@ export enum OrderStatus {
 
 // Payment Method enum
 export enum PaymentMethod {
-  COD = "cod", // Cash on Delivery
+  CARD = "card", // Cash on Delivery
   BANK_TRANSFER = "bank_transfer", // Chuyển khoản
-  MOMO = "momo", // Ví MoMo
-  ZALOPAY = "zalopay", // ZaloPay
 }
 
 // Order interface for TypeScript
@@ -154,7 +152,7 @@ const OrderSchema: Schema = new Schema(
       type: String,
       enum: Object.values(PaymentMethod),
       required: true,
-      default: PaymentMethod.COD,
+      default: PaymentMethod.CARD,
     },
     orderStatus: {
       type: String,

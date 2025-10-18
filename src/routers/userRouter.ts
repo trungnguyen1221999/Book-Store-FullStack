@@ -7,6 +7,8 @@ import {
   changePassword,
   deleteUserAccount,
   getAllUsers,
+  refreshAccessToken,
+  logoutUser,
 } from "../controllers/userController.js";
 import {
   authenticateToken,
@@ -24,6 +26,7 @@ userRouter.get("/test", (req, res) => {
 // PUBLIC ROUTES - Không cần authentication
 userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
+userRouter.post("/refresh-token", refreshAccessToken);
 
 // PROTECTED ROUTES - Cần accessToken
 
@@ -43,6 +46,12 @@ userRouter.put(
   authenticateToken as RequestHandler,
   changePassword as RequestHandler
 ); // PUT /users/change-password
+userRouter.post(
+  "/logout",
+  authenticateToken as RequestHandler,
+  logoutUser as RequestHandler
+); // POST /users/logout
+
 // ADMIN ONLY ROUTES
 userRouter.get(
   "/all",

@@ -2,6 +2,11 @@ import { Request, Response } from "express";
 import User from "../models/UserModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../utils/tokenUtils.js";
 
 // Extend Request type để include user info from JWT
 interface AuthRequest extends Request {
@@ -53,13 +58,35 @@ const registerUser = async (req: Request, res: Response) => {
       role,
     });
 
+    // Generate tokens
+    const accessToken = generateAccessToken({
+      id: (newUser._id as any).toString(),
+      email: newUser.email,
+      role: newUser.role,
+    });
+
+    const refreshToken = generateRefreshToken({
+      id: (newUser._id as any).toString(),
+      email: newUser.email,
+    });
+
+    // Save refresh token to database
+    newUser.refreshToken = refreshToken;
+    await newUser.save();
+
     // Remove password from response
     const userResponse = newUser.toObject();
-    const { password: _, ...userWithoutPassword } = userResponse;
+    const {
+      password: _,
+      refreshToken: __,
+      ...userWithoutSensitiveData
+    } = userResponse;
 
     return res.status(201).json({
       message: "User registered successfully",
-      data: userWithoutPassword,
+      accessToken,
+      refreshToken,
+      user: userWithoutSensitiveData,
     });
   } catch (error) {
     return res.status(500).json({
@@ -97,25 +124,35 @@ const loginUser = async (req: Request, res: Response) => {
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-        role: user.role,
-      },
-      process.env.JWT_SECRET || "123456",
-      { expiresIn: "1d" }
-    );
+    // Generate tokens
+    const accessToken = generateAccessToken({
+      id: (user._id as any).toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    const refreshToken = generateRefreshToken({
+      id: (user._id as any).toString(),
+      email: user.email,
+    });
+
+    // Save refresh token to database
+    user.refreshToken = refreshToken;
+    await user.save();
 
     // Remove password from response
     const userResponse = user.toObject();
-    const { password: _, ...userWithoutPassword } = userResponse;
+    const {
+      password: _,
+      refreshToken: __,
+      ...userWithoutSensitiveData
+    } = userResponse;
 
     return res.status(200).json({
       message: "Login successful",
-      accessToken: token,
-      user: userWithoutPassword,
+      accessToken,
+      refreshToken,
+      user: userWithoutSensitiveData,
     });
   } catch (error) {
     return res.status(500).json({
@@ -285,6 +322,68 @@ const getAllUsers = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// REFRESH TOKEN - Tạo access token mới từ refresh token
+const refreshAccessToken = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        message: "Refresh token is required",
+      });
+    }
+
+    // Verify refresh token
+    const decoded = verifyRefreshToken(refreshToken) as any;
+
+    // Tìm user và kiểm tra refresh token có match không
+    const user = await User.findById(decoded.id).select("+refreshToken");
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(403).json({
+        message: "Invalid refresh token",
+      });
+    }
+
+    // Generate new access token
+    const newAccessToken = generateAccessToken({
+      id: String(user._id),
+      email: user.email,
+      role: user.role,
+    });
+
+    return res.status(200).json({
+      message: "Access token refreshed successfully",
+      accessToken: newAccessToken,
+    });
+  } catch (error) {
+    return res.status(403).json({
+      message: "Invalid or expired refresh token",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+// LOGOUT - Xóa refresh token
+const logoutUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    // Xóa refresh token khỏi database
+    await User.findByIdAndUpdate(userId, {
+      $unset: { refreshToken: 1 },
+    });
+
+    return res.status(200).json({
+      message: "Logout successful",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error during logout",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
 export {
   registerUser,
   loginUser,
@@ -293,4 +392,6 @@ export {
   changePassword,
   deleteUserAccount,
   getAllUsers,
+  refreshAccessToken,
+  logoutUser,
 };

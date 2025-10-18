@@ -1,14 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-
-// Extend Request type
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
-}
+import { AuthRequest } from "../types/AuthRequest.js";
+import { verifyAccessToken } from "../utils/tokenUtils.js";
 
 // Middleware để verify JWT token
 export const authenticateToken = (
@@ -28,8 +21,8 @@ export const authenticateToken = (
       return;
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "123456") as {
+    // Verify access token
+    const decoded = verifyAccessToken(token) as {
       id: string;
       email: string;
       role: string;
