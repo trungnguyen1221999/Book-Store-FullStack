@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectMongoDB from "./Database/ConnectMongoDB.js";
 import routers from "./routers/BookRouter.js";
-import testRouter from "./routers/TestRouter.js";
+import categoryRouters from "./routers/categoryRouter.js";
 
 dotenv.config();
 
@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // API routes first
 app.use("/api", routers);
-app.use("/test", testRouter);
+app.use("/api/category", categoryRouters);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
