@@ -1,0 +1,37 @@
+{
+  "name": "laptop-shop-ecommerce-fullstack",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "dev": "nodemon --exec \"node --loader ts-node/esm\" src/server.ts",
+    "dev:build": "tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trungnguyen1221999/Laptop-Shop-Ecommerce-FullStack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trungnguyen1221999/Laptop-Shop-Ecommerce-FullStack/issues"
+  },
+  "homepage": "https://github.com/trungnguyen1221999/Laptop-Shop-Ecommerce-FullStack#readme",
+  "description": "",
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.7",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.0.1"
+  }
+}
