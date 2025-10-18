@@ -5,8 +5,8 @@ export interface IBook extends Document {
   title: string;
   author: string;
   description: string;
-  oldPrice: number;
-  newPrice?: number;
+  oldPrice?: number;
+  newPrice: number;
   quantity: number;
   images: string[];
   trending: boolean;
@@ -33,12 +33,12 @@ const BookSchema: Schema = new Schema(
     },
     oldPrice: {
       type: Number,
-      required: true,
       min: 0,
     },
     newPrice: {
       type: Number,
       min: 0,
+      required: true,
     },
     quantity: {
       type: Number,

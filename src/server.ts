@@ -10,8 +10,12 @@ dotenv.config();
 connectMongoDB();
 
 const app = express();
+
+// Middleware to parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/", router);
 app.use("/api", routers);
 const PORT = process.env.PORT || 3000;
 

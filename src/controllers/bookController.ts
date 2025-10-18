@@ -53,4 +53,29 @@ const deleteABook = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Error deleting book", error });
   }
 };
-export { createABook, getAllBooks, editABook, deleteABook };
+
+const sortByPrice = async (req: Request, res: Response) => {
+  try {
+    // Check if 'asc' exists in query, otherwise default to 'desc'
+    const isAscending = "asc" in req.query;
+    const sortOrder = isAscending ? 1 : -1; // asc = 1 (tăng dần), desc = -1 (giảm dần)
+
+    const SortBooks = await Book.find().sort({ newPrice: sortOrder });
+
+    const sortType = isAscending ? "ascending" : "descending";
+    return res.status(200).json({
+      message: `Books sorted by price in ${sortType} order`,
+      data: SortBooks,
+    });
+  } catch (error) {
+    console.error("Sort error:", error); // Add logging to debug
+    return res
+      .status(500)
+      .json({
+        message: "Error sorting books",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+  }
+};
+
+export { createABook, getAllBooks, editABook, deleteABook, sortByPrice };
