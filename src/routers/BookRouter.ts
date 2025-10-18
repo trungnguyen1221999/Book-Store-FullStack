@@ -9,16 +9,17 @@ import {
 
 const routers = Router();
 
-routers.post("/add-book", createABook);
+// Test route first
+routers.get("/hello", (req, res) => {
+  res.json({ message: "Hello from BookRouter!" });
+});
 
-// Sort route - put before /books to avoid conflicts
+// Sort route
 routers.get("/sort", sortByPrice);
 
+routers.post("/add-book", createABook);
 routers.get("/books", getAllBooks);
-
 routers.put("/edit-book/:id", editABook);
-
 routers.delete("/delete-book/:id", deleteABook);
-
 
 export default routers;

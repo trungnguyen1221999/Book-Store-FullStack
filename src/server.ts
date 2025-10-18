@@ -1,8 +1,8 @@
 import express from "express";
-import router from "./routers/web.js";
 import dotenv from "dotenv";
 import connectMongoDB from "./Database/ConnectMongoDB.js";
 import routers from "./routers/BookRouter.js";
+import testRouter from "./routers/TestRouter.js";
 
 dotenv.config();
 
@@ -15,8 +15,15 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/", router);
+// Add logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+  next();
+});
+
+// API routes first
 app.use("/api", routers);
+app.use("/test", testRouter);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
