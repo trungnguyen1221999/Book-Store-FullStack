@@ -5,6 +5,7 @@ export interface ICategory extends Document {
   name: string;
   description?: string;
   slug: string;
+  sold: number;
   imageURL?: string;
 }
 
@@ -27,6 +28,12 @@ const CategorySchema: Schema = new Schema(
       unique: true,
       lowercase: true,
       trim: true,
+    },
+    sold: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
     },
     imageURL: {
       type: String,

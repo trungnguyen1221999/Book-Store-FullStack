@@ -9,6 +9,7 @@ export interface IBook extends Document {
   newPrice: number;
   coverColor?: string[];
   quantity: number;
+  sold: number;
   images: string[];
   trending: boolean;
   categoryId?: mongoose.Schema.Types.ObjectId;
@@ -56,6 +57,12 @@ const BookSchema: Schema = new Schema(
       },
     ],
     quantity: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
+    sold: {
       type: Number,
       required: true,
       min: 0,
